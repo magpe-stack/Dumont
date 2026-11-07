@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dumont — Relógio, Cronômetro e Cartão de Ponto</title>
+  <meta name="description" content="Dumont: relógio digital, cronômetro, cartão de ponto e gestão da jornada diária. PWA 100% offline.">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    /* Aplica o tema salvo antes da primeira pintura (padrão: claro). */
+    try {
+      var cfg = JSON.parse(localStorage.getItem('dumont.config') || '{}');
+      if (cfg.tema === 'escuro') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch (e) {}
+  </script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <!-- ============ SPLASH SCREEN (3 segundos) ============ -->
+  <div id="splash" role="status" aria-label="Carregando o Dumont">
+    <div class="splash-sky" aria-hidden="true"></div>
+    <div class="splash-center">
+      <div class="splash-instrument" aria-hidden="true">
+        <div class="splash-ring"></div>
+        <div class="splash-ring splash-ring-2"></div>
+        <div class="splash-needle"></div>
+        <img class="splash-logo" src="icon-192.png" alt="" width="120" height="120">
+      </div>
+      <p class="splash-name">Dumont</p>
+      <p class="splash-tag">Precisão no ar, precisão no tempo</p>
+    </div>
+    <div class="splash-horizon" aria-hidden="true"></div>
+  </div>
+
+  <!-- ============ APLICAÇÃO ============ -->
+  <div id="app" inert>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="topbar">
+      <a class="brand" id="brandLink" href="#relogio" aria-label="Dumont — ir para o relógio principal">
+        <img src="icon-192.png" alt="" width="40" height="40">
+        <span class="brand-name">Dumont</span>
+      </a>
+
+      <button type="button" id="menuBtn" class="menu-btn" aria-expanded="false" aria-controls="menuPanel" aria-label="Abrir menu">
+        <span class="burger" aria-hidden="true"></span>
+      </button>
+
+      <nav id="menuPanel" class="menu" aria-label="Menu principal" hidden>
+        <p class="menu-title">Registros</p>
+        <ul>
+          <li><button type="button" class="menu-item" data-action="ponto"><span aria-hidden="true">⏱️</span> Ponto</button></li>
+          <li><button type="button" class="menu-item" data-action="entrada"><span aria-hidden="true">✍️</span> Entrada</button></li>
+          <li><button type="button" class="menu-item" data-action="meudia"><span aria-hidden="true">📅</span> Meu Dia</button></li>
+          <li><button type="button" class="menu-item" data-action="backup"><span aria-hidden="true">💾</span> Backup</button></li>
+        </ul>
+
+        <p class="menu-title">Aplicativo</p>
+        <ul>
+          <li><button type="button" class="menu-item" data-action="instalar"><span aria-hidden="true">📲</span> Instalar</button></li>
+          <li><button type="button" class="menu-item" data-action="sobre"><span aria-hidden="true">✈️</span> Sobre</button></li>
+          <li><a class="menu-item" href="https://github.com/magpe-stack/Dumont" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🐙</span> GitHub</a></li>
+          <li><a class="menu-item" href="https://github.com/magpe-stack/Dumont/blob/main/README.md" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">❓</span> Ajuda</a></li>
+        </ul>
+
+        <p class="menu-title">Preferências</p>
+        <ul>
+          <li><button type="button" class="menu-item switch-row" role="switch" aria-checked="true" data-action="formato"><span>Hora em 24h (desligado: 12h AM/PM)</span><span class="switch" aria-hidden="true"></span></button></li>
+          <li><button type="button" class="menu-item switch-row" role="switch" aria-checked="true" data-action="segundos"><span>Exibir segundos</span><span class="switch" aria-hidden="true"></span></button></li>
+          <li><button type="button" class="menu-item switch-row" role="switch" aria-checked="false" data-action="tema"><span>Modo escuro</span><span class="switch" aria-hidden="true"></span></button></li>
+          <li><button type="button" class="menu-item" data-action="telacheia" id="btnTelaCheia"><span aria-hidden="true">⛶</span> <span id="txtTelaCheia">Tela cheia</span></button></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="conteudo" tabindex="-1">
+
+      <!-- ===== Página inicial: Relógio + Cronômetro ===== -->
+      <section id="view-relogio" class="view" aria-labelledby="t-relogio">
+        <h1 id="t-relogio" class="sr-only">Relógio digital</h1>
+
+        <div class="card clock-card">
+          <div class="clock" role="timer" aria-live="off" aria-label="Hora atual">
+            <span id="clockTime" class="clock-time">--:--:--</span>
+            <span id="clockAmpm" class="clock-ampm"></span>
+          </div>
+          <p id="clockDate" class="clock-date"></p>
+        </div>
+
+        <div class="card sw-card">
+          <h2>Cronômetro</h2>
+          <div id="swDisplay" class="sw-display" role="timer" aria-live="off" aria-label="Cronômetro">00:00:00.00</div>
+          <div class="sw-actions">
+            <button type="button" id="swStart" class="btn primary">Iniciar</button>
+            <button type="button" id="swLap" class="btn accent" disabled>Volta</button>
+            <button type="button" id="swReset" class="btn ghost" disabled>Redefinir</button>
+          </div>
+          <ul id="lapList" class="laps" aria-label="Voltas registradas"></ul>
+        </div>
+      </section>
+
+      <!-- ===== Página Meu Dia ===== -->
+      <section id="view-meudia" class="view" aria-labelledby="t-meudia" hidden>
+        <div class="print-only print-head">
+          <p class="print-brand">Dumont — Cartão de Ponto</p>
+          <p id="printEmissao"></p>
+        </div>
+
+        <div class="page-head">
+          <div>
+            <h1 id="t-meudia">Meu Dia</h1>
+            <p id="resumoDias" class="muted"></p>
+          </div>
+        </div>
+
+        <div class="toolbar no-print" role="group" aria-label="Ferramentas do Meu Dia">
+          <button type="button" class="btn primary" data-action="ponto">⏱️ Ponto</button>
+          <button type="button" class="btn ghost" data-action="entrada">✍️ Entrada</button>
+          <button type="button" class="btn ghost" data-action="backup">💾 Backup unificado</button>
+          <button type="button" class="btn ghost" data-action="importar">📥 Importar / Restaurar</button>
+          <button type="button" class="btn ghost" data-action="imprimir">🖨️ Imprimir</button>
+          <label class="order-label" for="ordemDias">Ordem
+            <select id="ordemDias">
+              <option value="asc">Mais antigos primeiro</option>
+              <option value="desc">Mais recentes primeiro</option>
+            </select>
+          </label>
+          <input type="file" id="arquivoImport" accept="application/json,.json" hidden>
+        </div>
+
+        <div id="diasLista"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <nav aria-label="Links oficiais do Dumont">
+        <a href="https://magpe-stack.github.io/Dumont/" target="_blank" rel="noopener noreferrer"><strong>App</strong> magpe-stack.github.io/Dumont</a>
+        <a href="https://github.com/magpe-stack/Dumont" target="_blank" rel="noopener noreferrer"><strong>GitHub</strong> magpe-stack/Dumont</a>
+        <a href="https://github.com/magpe-stack/Dumont/blob/main/README.md" target="_blank" rel="noopener noreferrer"><strong>README / Manual</strong></a>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- ============ MODAIS ============ -->
+  <dialog id="dlgPonto" aria-labelledby="dlgPontoTitulo">
+    <form id="formPonto" novalidate>
+      <h2 id="dlgPontoTitulo">Registrar ponto</h2>
+      <p class="now-box" aria-live="off"><span id="pontoAgora" class="mono"></span></p>
+
+      <fieldset>
+        <legend>Tipo do registro</legend>
+        <label class="radio"><input type="radio" name="tipoPonto" value="inicio" checked> ▶ Início</label>
+        <label class="radio"><input type="radio" name="tipoPonto" value="termino"> ■ Término</label>
+      </fieldset>
+
+      <label for="obsPonto">Observação (opcional)</label>
+      <input id="obsPonto" type="text" maxlength="50" autocomplete="off" aria-describedby="obsPontoCount">
+      <p id="obsPontoCount" class="counter">0/50</p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancelar</button>
+        <button type="submit" class="btn primary">Registrar agora</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlgEntrada" aria-labelledby="dlgEntradaTitulo">
+    <form id="formEntrada" novalidate>
+      <h2 id="dlgEntradaTitulo">Entrada manual (retroativa)</h2>
+
+      <fieldset>
+        <legend>Data</legend>
+        <div class="grid-3">
+          <div><label for="ent-dia">Dia</label><input id="ent-dia" type="number" inputmode="numeric" min="1" max="31" required></div>
+          <div><label for="ent-mes">Mês</label>
+            <select id="ent-mes" required>
+              <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+              <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
+              <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+              <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div><label for="ent-ano">Ano</label><input id="ent-ano" type="number" inputmode="numeric" min="1900" max="2100" required></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Horário (24h)</legend>
+        <div class="grid-2">
+          <div><label for="ent-hora">Hora</label><input id="ent-hora" type="number" inputmode="numeric" min="0" max="23" required></div>
+          <div><label for="ent-minuto">Minuto</label><input id="ent-minuto" type="number" inputmode="numeric" min="0" max="59" required></div>
+        </div>
+      </fieldset>
+
+      <label for="ent-tipo">Tipo</label>
+      <select id="ent-tipo">
+        <option value="inicio">▶ Início</option>
+        <option value="termino">■ Término</option>
+      </select>
+
+      <label for="ent-obs">Observação (opcional)</label>
+      <input id="ent-obs" type="text" maxlength="50" autocomplete="off" aria-describedby="ent-obsCount">
+      <p id="ent-obsCount" class="counter">0/50</p>
+
+      <p id="erroEntrada" class="error" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancelar</button>
+        <button type="submit" class="btn primary">Lançar entrada</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlgSobre" aria-labelledby="dlgSobreTitulo">
+    <div class="dialog-body">
+      <h2 id="dlgSobreTitulo">Sobre o Dumont</h2>
+      <p>O <strong>Dumont</strong> é um relógio, cronômetro e cartão de ponto que funciona direto no navegador, inclusive sem internet, e guarda seus registros apenas no seu dispositivo.</p>
+      <p>O nome homenageia <strong>Alberto Santos Dumont</strong> (1873–1932), pioneiro da aviação e inventor brasileiro, que realizou em Paris, em 1906, o voo do 14-bis, reconhecido no Brasil como o primeiro voo de um aparelho mais pesado que o ar com meios próprios de decolagem.</p>
+      <p>Santos Dumont também ajudou a popularizar o <strong>relógio de pulso</strong>: por volta de 1904, ao perceber que consultar um relógio de bolso era impraticável com as mãos ocupadas nos comandos, pediu ao joalheiro Louis Cartier um relógio que pudesse ser lido no próprio punho, durante o voo. A ideia levou à criação do célebre modelo Santos.</p>
+      <p>Precisão e confiança no tempo são o espírito desta aplicação.</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn primary" data-close>Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
