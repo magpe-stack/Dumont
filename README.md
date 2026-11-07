@@ -10,7 +10,7 @@ Este manual explica como usar cada recurso, como proteger seus dados com backup 
 
 ![Dumont Cover](DumontCover.png)
 
-Seu relógio de ponto PWA.
+Um relógio de ponto PWA que homenageia Alberto Santos Dumont
 
 ### Para quem o Dumont foi feito
 
