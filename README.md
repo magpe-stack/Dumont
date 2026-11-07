@@ -1,7 +1,5 @@
 # Dumont — Manual do Usuário
 
-Nov 7, 2026 · @Marinaldo
-
 ## 1. Apresentação
 
 O Dumont é um aplicativo web que reúne relógio digital, cronômetro, cartão de ponto e histórico diário de jornada em uma única tela, e funciona inclusive sem internet. Ele roda direto no navegador, pode ser instalado como aplicativo e guarda todos os seus registros somente no seu próprio dispositivo.
