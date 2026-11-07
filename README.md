@@ -27,6 +27,8 @@ O aplicativo atende quem precisa marcar horários de trabalho sem depender de um
 - **Temas claro e escuro**, navegação por teclado, foco visível e cores com contraste adequado.
 - **Instalação como aplicativo (PWA)** e uso 100% offline.
 
+![Logotipo do Dumont - Relógio de Ponto PWA](icon-512.png)
+
 ### Como este manual está organizado
 
 As seções seguem a ordem natural de uso: primeiro abrir e conhecer a tela, depois os recursos de tempo (relógio e cronômetro), depois o cartão de ponto e o histórico, e por fim backup, privacidade, implantação e solução de problemas. Na seção 18 há uma tabela de referência rápida que resume onde fica cada função.
