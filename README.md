@@ -6,6 +6,12 @@ O Dumont é um aplicativo web que reúne relógio digital, cronômetro, cartão 
 
 Este manual explica como usar cada recurso, como proteger seus dados com backup e como publicar e manter o projeto no GitHub. Ele foi escrito para dois públicos: quem apenas usa o aplicativo (seções 2 a 14) e quem o implanta ou personaliza (seção 15). As seções 16 a 19 servem a ambos.
 
+# Dumont
+
+![Dumont Cover](DumontCover.png)
+
+Seu relógio de ponto PWA.
+
 ### Para quem o Dumont foi feito
 
 O aplicativo atende quem precisa marcar horários de trabalho sem depender de um sistema corporativo: profissionais autônomos, estudantes, pessoas em regime de banco de horas, equipes pequenas e qualquer um que queira saber, ao fim do dia, quanto tempo realmente trabalhou. Como não há cadastro, login nem servidor, não existe nada para configurar antes de começar.
