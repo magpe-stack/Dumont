@@ -28,7 +28,7 @@ O aplicativo atende quem precisa marcar horários de trabalho sem depender de um
 - **Instalação como aplicativo (PWA)** e uso 100% offline.
 
 <p align="center">
-  <img src="icon-512.png" alt="Logotipo do Dumont - Relógio de Ponto PWA" width="200">
+  <img src="icon-512.png" alt="Logotipo do Dumont - Relógio de Ponto PWA" width="400">
 </p>
 
 ### Como este manual está organizado
